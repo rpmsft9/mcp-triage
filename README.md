@@ -70,10 +70,20 @@ Everything works, and the test-suite is green, **without** any API key.
 
 ## Bring your own scanner
 
-`mcp-triage` is scanner-agnostic. Findings are normalized on ingest — it reads its native
-shape and maps common `rule` / `message` / `match` / `severity` fields, inferring the OWASP
-MCP category from keywords when one isn't supplied. Pipe in `mcp-scan`, Cisco `mcp-scanner`,
-eSentire, or your own output.
+`mcp-triage` is scanner-agnostic. It does not generate findings — it consumes them. Existing
+scanners are *finding generators*; they hand you a noisy pile. `mcp-triage` is the layer that
+turns that pile into a short, trustworthy list and governs the fleet. Pipe in any of them:
+
+| Scanner | What it is |
+| --- | --- |
+| [Cisco MCP Scanner](https://github.com/cisco-ai-defense/mcp-scanner) | Open source (Cisco AI Defense). YARA + LLM-as-judge + AI Defense engines. **The scanner in the [audit](https://appsecsanta.com/research/mcp-server-security-audit-2026) whose 27→6 result the bundled example reproduces.** |
+| [Invariant MCP-Scan](https://invariantlabs.ai/blog/introducing-mcp-scan) | Open source, most widely adopted. Prompt injection, tool poisoning, rug pulls, tool-name shadowing, typosquatting. Now part of Snyk (rebranded *Snyk Agent Scan*). |
+| [Enkrypt AI MCP Scanner](https://www.enkryptai.com/blog/we-scanned-1-000-mcp-servers-33-had-critical-vulnerabilities) | Commercial. Behind the "33% of 1,000 servers had critical vulnerabilities" scan. |
+
+Findings are normalized on ingest — `mcp-triage` reads its native shape and maps common
+`rule` / `message` / `match` / `severity` fields, inferring the OWASP MCP category from
+keywords when one isn't supplied. A thin adapter per scanner is all it takes to onboard a
+new source.
 
 ## Architecture
 
